@@ -15,15 +15,8 @@ def index(request):
     data = request.args
 
     if 'hub.mode' in data:
-        # Get the Access Token
-        client = secretmanager.SecretManagerServiceClient()
-        resource_name = f"projects/{os.getenv('GCP_PROJECT')}/secrets/" \
-                        f"STRAVA_VERIFY_TOKEN/versions/latest"
-        verify_token = client.access_secret_version(resource_name)\
-            .payload.data.decode('utf-8')
-
         if data['hub.mode'] != 'subscribe' \
-                or data['hub.verify_token'] != verify_token:
+                or data['hub.verify_token'] != os.getenv('VERIFY_TOKEN'):
             return 'Invalid request', 401
 
         # Valid request, return challenge
@@ -31,9 +24,19 @@ def index(request):
 
     data = request.get_json()
 
-    if data['subscription_id'] != os.getenv('SUBSCRIPTION_ID'):
-        logger.error('Invalid subscription ID')
+    # Initialise Secret Manager
+    client = secretmanager.SecretManagerServiceClient()
+    resource_name = f"projects/{os.getenv('GCP_PROJECT')}/secrets/" \
+                    f"STRAVA_SUBSCRIPTION_ID/versions/latest"
+
+    # Get the Subscription Id
+    subscription_id = client.access_secret_version(resource_name) \
+        .payload.data.decode('utf-8')
+
+    if data['subscription_id'] != subscription_id:
+        logger.error('Invalid subscription Id')
         abort(400)
+
     if data['object_type'] == 'activity':
         publisher = pubsub.PublisherClient()
         publisher.publish(
