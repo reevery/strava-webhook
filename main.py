@@ -34,7 +34,7 @@ def index(request):
         "name": resource_name
     }).payload.data.decode('utf-8')
 
-    if data['subscription_id'] != subscription_id:
+    if data['subscription_id'] != int(subscription_id):
         logger.error('Invalid subscription Id')
         abort(400)
 
