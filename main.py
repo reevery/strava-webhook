@@ -30,8 +30,9 @@ def index(request):
                     f"STRAVA_SUBSCRIPTION_ID/versions/latest"
 
     # Get the Subscription Id
-    subscription_id = client.access_secret_version(resource_name) \
-        .payload.data.decode('utf-8')
+    subscription_id = client.access_secret_version(request={
+        "name": resource_name
+    }).payload.data.decode('utf-8')
 
     if data['subscription_id'] != subscription_id:
         logger.error('Invalid subscription Id')
