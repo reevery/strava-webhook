@@ -9,7 +9,7 @@ The function handles two situations:
 
 This repo is one of four in an example module of how to load Strava data to Google BigQuery.
 
-##Initialisation
+## Initialisation
 
 You should deploy this to a Cloud Function first, as you need to validate the endpoint URL to Strava. 
 When deploying, you need to specify a random string as an environment variable VERIFY_TOKEN.
